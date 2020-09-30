@@ -1,0 +1,64 @@
+.flex.center
+  .Container
+    .PostDetailPage
+      %header.PostHeader
+        = image_tag @post.image, class: "PostHeader" if @post.image.present?
+        .PostHeaderBack
+          =link_to '/' do
+            = icon('fas', 'arrow-left', class: "arrow")
+      .PostInfo
+        .flex.verticalCenter.PostDetailTitleWithAudio
+          %h2.PostDetailTitle
+            = @post.title
+        %span.PublishedAt
+          = @post.created_at.strftime("%Y-%m-%d")
+      .PostDetail
+        .PostDetailBody
+          = simple_format(@post.text)
+        %h4.Comment-title コメント投稿
+        = form_with model: [@post, @comment], html: {class: "Form-info"}, local: true do |f|
+          .Form-info__contents
+            = f.text_field :nickname, class: 'Form-info__nickname', placeholder: 'type a nickname'
+            = f.text_area :text, class: 'Form-info__comment', placeholder: 'type a text', rows: "3"
+          .Form-info__submit-box
+            = f.submit 'Send', class: 'Form-info__submit-btn'
+        .PostDetailComments
+          %h4.CommentListTitle <コメント一覧>
+          - if @comments
+            - @comments.each do |comment|
+              .comment-box
+                .nickname 
+                  = comment.nickname
+                .comment
+                  = comment.text
+
+      .Player.flex.spaceBetween.wrap
+        %h2.PlayerTitle
+          = @post.title
+          = audio_tag(@post.audio, id: 'play-audio', controls: true)
+
+      %nav.BottomNav_BottomNav__2Vey4
+        %ul.BottomNav_NavItems___s-90
+          .BottomNav_NavItem__tgPfn
+            =link_to "/" do
+              = icon('fas', 'home', class: "icon")
+              %p.BottomNav_title_active__1SVTZ ホーム
+          .BottomNav_NavItem__tgPfn
+            - if user_signed_in?
+              - if current_user.admin?
+                =link_to edit_post_path(@post.id) do
+                  = icon('fas', 'edit', class: "icon")
+                  %p.BottomNav_title_active__1SVTZ 編集
+            - else
+              =link_to new_user_registration_path do
+                = icon('fas', 'user-plus', class: "icon")
+                %p.BottomNav_title_active__1SVTZ 新規登録
+          .BottomNav_NavItem__tgPfn
+            - if user_signed_in?
+              =link_to destroy_user_session_path, method: :delete do
+                = icon('fas', 'sign-out-alt', class: "icon")
+                %p.BottomNav_title_active__1SVTZ ログアウト
+            - else
+              =link_to new_user_session_path do
+                = icon('fas', 'sign-in-alt', class: "icon")
+                %p.BottomNav_title_active__1SVTZ ログイン
